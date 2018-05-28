@@ -1,4 +1,4 @@
-FROM php:7.1-fpm
+FROM php:7.2-fpm
 
 # install the PHP extensions we need
 RUN set -ex; \
@@ -6,7 +6,7 @@ RUN set -ex; \
     apt-get update; \
     apt-get install -y \
             libjpeg62-turbo-dev \
-            libpng12-dev \
+            libpng-dev \
             ; \
     \
     docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
