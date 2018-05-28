@@ -62,6 +62,9 @@ COPY opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 COPY uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 COPY realpath_turbo.ini /usr/local/etc/php/conf.d/realpath_turbo.ini
 COPY php.ini /usr/local/etc/php/php.ini
+RUN curl -o /bin/wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+COPY wp-su.sh /bin/wp
+RUN chmod +x /bin/wp-cli.phar /bin/wp
 
 COPY www.conf /usr/local/etc/php-fpm.d/www.conf
 
