@@ -4,9 +4,9 @@ FROM php:7.2-fpm
 RUN set -ex; \
     \
     apt-get update; \
-    apt-get install -y \
+    apt-get install -y nginx-light \
             libjpeg62-turbo-dev \
-            libpng12-dev \
+            libpng-dev \
             ; \
     \
     docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
@@ -75,6 +75,9 @@ COPY www.conf /usr/local/etc/php-fpm.d/www.conf
 #         && echo "zend_extension=ioncube_loader_lin_7.1.so" > /usr/local/etc/php/conf.d/00-ioncube-loader.ini
 
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY default.conf /etc/nginx/conf.d/default.conf
+
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
 
