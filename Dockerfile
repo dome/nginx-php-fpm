@@ -6,7 +6,7 @@ RUN set -ex; \
     apt-get update; \
     apt-get install -y nginx-light procps \
             libjpeg62-turbo-dev \
-            libpng-dev \
+            libpng-dev sudo less \
             ; \
     \
     docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
