@@ -6,7 +6,7 @@ RUN set -ex; \
     apt-get update; \
     apt-get install -y nginx-light procps \
             libjpeg62-turbo-dev \
-            libpng-dev sudo less \
+            libpng-dev sudo less libmemcached-dev zlib1g-dev\
             ; \
     \
     docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
@@ -15,6 +15,10 @@ RUN set -ex; \
     apt-get clean autoclean; \
     apt-get autoremove -y; \
     rm -rf /var/lib/apt/lists/*
+
+RUN pecl install redis-4.0.1 \
+    && pecl install memcached \
+    && docker-php-ext-enable redis memcached 
 
 # TODO consider removing the *-dev deps and only keeping the necessary lib* packages
 
@@ -29,30 +33,6 @@ RUN set -xe \
         && make test NO_INTERACTION=1 \
         && make install
 
-# install new relic
-RUN apt-get update && \
-    apt-get install -y \
-    libyaml-dev \
-    python-pip \
-    python-dev \
-    wget && \
-    apt-get clean autoclean && \
-    apt-get autoremove -y && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN mkdir -p /opt/newrelic
-WORKDIR /opt/newrelic
-RUN wget -r -nd --no-parent -Alinux.tar.gz \
-         http://download.newrelic.com/php_agent/release/ >/dev/null 2>&1 \
-         && tar -xzf newrelic-php*.tar.gz --strip=1
-ENV NR_INSTALL_SILENT true
-ENV NR_INSTALL_PHPLIST /usr/local/bin/
-RUN bash newrelic-install install
-WORKDIR /
-RUN pip install newrelic-plugin-agent
-RUN mkdir -p /var/log/newrelic
-RUN mkdir -p /var/run/newrelic
-
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
 
@@ -60,6 +40,8 @@ RUN mkdir -p /var/tmp/php/opcache
 RUN chown www-data:www-data /var/tmp/php/opcache
 COPY opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 COPY uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+COPY memcached.ini /usr/local/etc/php/conf.d/memcached.ini
+COPY redis.ini /usr/local/etc/php/conf.d/redis.ini
 COPY realpath_turbo.ini /usr/local/etc/php/conf.d/realpath_turbo.ini
 COPY php.ini /usr/local/etc/php/php.ini
 RUN curl -o /bin/wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
